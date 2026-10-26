@@ -568,13 +568,16 @@ function pickVoice(){
   }
   return zh[0];
 }
+const SHORT_READS = ['佛','得','特','讷','勒','日','儿'];   // 没有对应一声字的呼读音,读得又轻又短,声调几乎听不出
 function speak(text){
   try{
     if(!('speechSynthesis' in window)) return;
     const u = new SpeechSynthesisUtterance(text);
     u.lang='zh-CN';
-    u.rate=0.6;      // 放慢,像老师一个字一个字清楚地读
-    u.pitch=1.05;    // 音调稍微提高,更亲切
+    const short = SHORT_READS.indexOf(text) >= 0;
+    u.rate = short ? 1.5 : 0.6;    // 这几个又快又短;其余放慢像老师教读
+    u.pitch = short ? 1.0 : 1.05;  // 轻读用中性音调,更接近一声
+    u.volume = short ? 0.85 : 1.0; // 轻读音量稍微放轻
     const v = pickVoice();
     if(v) u.voice = v;
     speechSynthesis.cancel(); speechSynthesis.speak(u);
