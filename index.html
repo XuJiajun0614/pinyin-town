@@ -176,7 +176,7 @@
       <h2>🩷 第一站:韵母屋</h2>
       <div class="story">
         📖 粉色的<b>韵母屋</b>到啦!韵母是拼音里的<b>歌唱家</b>,它们让音节发出好听的声音,还背着<b>声调小帽子</b>。
-        韵母一共有 <b>24 个</b>,分成四组:单韵母、复韵母、前鼻韵母、后鼻韵母。点一点卡片,认识它们吧!
+        韵母一共有 <b>24 个</b>,分成四组:单韵母、复韵母、前鼻韵母、后鼻韵母。点一点卡片,听听它怎么读吧!
       </div>
       <div id="yun-cards"></div>
     </div>
@@ -398,33 +398,33 @@
 <script>
 /* ---------- 数据 ---------- */
 const SHENGMU = [
-  {c:'b',e:'🍍',w:'菠萝'},{c:'p',e:'🍎',w:'苹果'},{c:'m',e:'👩',w:'妈妈'},{c:'f',e:'🪁',w:'风筝'},
-  {c:'d',e:'🌳',w:'大树'},{c:'t',e:'🐰',w:'兔子'},{c:'n',e:'🥛',w:'牛奶'},{c:'l',e:'🐯',w:'老虎'},
-  {c:'g',e:'🕊️',w:'鸽子'},{c:'k',e:'🐸',w:'蝌蚪'},{c:'h',e:'🦛',w:'河马'},{c:'j',e:'🥚',w:'鸡蛋'},
-  {c:'q',e:'🎈',w:'气球'},{c:'x',e:'🍉',w:'西瓜'},{c:'zh',e:'🕷️',w:'蜘蛛'},{c:'ch',e:'🏯',w:'长城'},
-  {c:'sh',e:'🦁',w:'狮子'},{c:'r',e:'🌅',w:'日出'},{c:'z',e:'🟣',w:'紫色'},{c:'c',e:'🍓',w:'草莓'},
-  {c:'s',e:'🥒',w:'丝瓜'},{c:'y',e:'👕',w:'衣服'},{c:'w',e:'🐦',w:'乌鸦'}
+  {c:'b',e:'🍍',w:'菠萝',read:'玻'},{c:'p',e:'🍎',w:'苹果',read:'坡'},{c:'m',e:'👩',w:'妈妈',read:'摸'},{c:'f',e:'🪁',w:'风筝',read:'佛'},
+  {c:'d',e:'🌳',w:'大树',read:'得'},{c:'t',e:'🐰',w:'兔子',read:'特'},{c:'n',e:'🥛',w:'牛奶',read:'讷'},{c:'l',e:'🐯',w:'老虎',read:'勒'},
+  {c:'g',e:'🕊️',w:'鸽子',read:'哥'},{c:'k',e:'🐸',w:'蝌蚪',read:'科'},{c:'h',e:'🦛',w:'河马',read:'喝'},{c:'j',e:'🥚',w:'鸡蛋',read:'基'},
+  {c:'q',e:'🎈',w:'气球',read:'欺'},{c:'x',e:'🍉',w:'西瓜',read:'希'},{c:'zh',e:'🕷️',w:'蜘蛛',read:'知'},{c:'ch',e:'🏯',w:'长城',read:'吃'},
+  {c:'sh',e:'🦁',w:'狮子',read:'诗'},{c:'r',e:'🌅',w:'日出',read:'日'},{c:'z',e:'🟣',w:'紫色',read:'资'},{c:'c',e:'🍓',w:'草莓',read:'雌'},
+  {c:'s',e:'🥒',w:'丝瓜',read:'思'},{c:'y',e:'👕',w:'衣服',read:'衣'},{c:'w',e:'🐦',w:'乌鸦',read:'乌'}
 ];
 const YUNMU = [
   {group:'单韵母',items:[
-    {c:'a',e:'8️⃣',w:'八',py:'bā'},{c:'o',e:'🙋',w:'我',py:'wǒ'},{c:'e',e:'🦢',w:'鹅',py:'é'},
-    {c:'i',e:'1️⃣',w:'一',py:'yī'},{c:'u',e:'5️⃣',w:'五',py:'wǔ'},{c:'ü',e:'🐟',w:'鱼',py:'yú'}]},
+    {c:'a',e:'8️⃣',w:'八',py:'bā',read:'啊'},{c:'o',e:'🙋',w:'我',py:'wǒ',read:'哦'},{c:'e',e:'🦢',w:'鹅',py:'é',read:'鹅'},
+    {c:'i',e:'1️⃣',w:'一',py:'yī',read:'衣'},{c:'u',e:'5️⃣',w:'五',py:'wǔ',read:'乌'},{c:'ü',e:'🐟',w:'鱼',py:'yú',read:'迂'}]},
   {group:'复韵母',items:[
-    {c:'ai',e:'❤️',w:'爱',py:'ài'},{c:'ei',e:'👧',w:'妹',py:'mèi'},{c:'ui',e:'💧',w:'水',py:'shuǐ'},
-    {c:'ao',e:'🎒',w:'包',py:'bāo'},{c:'ou',e:'✋',w:'手',py:'shǒu'},{c:'iu',e:'🐮',w:'牛',py:'niú'},
-    {c:'ie',e:'🍃',w:'叶',py:'yè'},{c:'üe',e:'🌙',w:'月',py:'yuè'},{c:'er',e:'👂',w:'耳',py:'ěr'}]},
+    {c:'ai',e:'❤️',w:'爱',py:'ài',read:'挨'},{c:'ei',e:'👧',w:'妹',py:'mèi',read:'诶'},{c:'ui',e:'💧',w:'水',py:'shuǐ',read:'威'},
+    {c:'ao',e:'🎒',w:'包',py:'bāo',read:'凹'},{c:'ou',e:'✋',w:'手',py:'shǒu',read:'欧'},{c:'iu',e:'🐮',w:'牛',py:'niú',read:'优'},
+    {c:'ie',e:'🍃',w:'叶',py:'yè',read:'耶'},{c:'üe',e:'🌙',w:'月',py:'yuè',read:'约'},{c:'er',e:'👂',w:'耳',py:'ěr',read:'儿'}]},
   {group:'前鼻韵母',items:[
-    {c:'an',e:'⛰️',w:'山',py:'shān'},{c:'en',e:'🚪',w:'门',py:'mén'},{c:'in',e:'🥇',w:'金',py:'jīn'},
-    {c:'un',e:'🌸',w:'春',py:'chūn'},{c:'ün',e:'☁️',w:'云',py:'yún'}]},
+    {c:'an',e:'⛰️',w:'山',py:'shān',read:'安'},{c:'en',e:'🚪',w:'门',py:'mén',read:'恩'},{c:'in',e:'🥇',w:'金',py:'jīn',read:'因'},
+    {c:'un',e:'🌸',w:'春',py:'chūn',read:'温'},{c:'ün',e:'☁️',w:'云',py:'yún',read:'晕'}]},
   {group:'后鼻韵母',items:[
-    {c:'ang',e:'🍬',w:'糖',py:'táng'},{c:'eng',e:'💡',w:'灯',py:'dēng'},{c:'ing',e:'⭐',w:'星',py:'xīng'},
-    {c:'ong',e:'🔴',w:'红',py:'hóng'}]}
+    {c:'ang',e:'🍬',w:'糖',py:'táng',read:'昂'},{c:'eng',e:'💡',w:'灯',py:'dēng',read:'鞥'},{c:'ing',e:'⭐',w:'星',py:'xīng',read:'英'},
+    {c:'ong',e:'🔴',w:'红',py:'hóng',read:'翁'}]}
 ];
 const ZHENGTI = [
-  {c:'zhi',e:'🧠',w:'知'},{c:'chi',e:'🍚',w:'吃'},{c:'shi',e:'🦁',w:'狮'},{c:'ri',e:'☀️',w:'日'},
-  {c:'zi',e:'📝',w:'字'},{c:'ci',e:'📖',w:'词'},{c:'si',e:'4️⃣',w:'四'},{c:'yi',e:'1️⃣',w:'一'},
-  {c:'wu',e:'5️⃣',w:'五'},{c:'yu',e:'🐟',w:'鱼'},{c:'ye',e:'🍃',w:'叶'},{c:'yue',e:'🌙',w:'月'},
-  {c:'yuan',e:'⚪',w:'圆'},{c:'yin',e:'🎵',w:'音'},{c:'yun',e:'☁️',w:'云'},{c:'ying',e:'🦅',w:'鹰'}
+  {c:'zhi',e:'🧠',w:'知',read:'知'},{c:'chi',e:'🍚',w:'吃',read:'吃'},{c:'shi',e:'🦁',w:'狮',read:'诗'},{c:'ri',e:'☀️',w:'日',read:'日'},
+  {c:'zi',e:'📝',w:'字',read:'资'},{c:'ci',e:'📖',w:'词',read:'雌'},{c:'si',e:'4️⃣',w:'四',read:'思'},{c:'yi',e:'1️⃣',w:'一',read:'衣'},
+  {c:'wu',e:'5️⃣',w:'五',read:'乌'},{c:'yu',e:'🐟',w:'鱼',read:'迂'},{c:'ye',e:'🍃',w:'叶',read:'耶'},{c:'yue',e:'🌙',w:'月',read:'约'},
+  {c:'yuan',e:'⚪',w:'圆',read:'冤'},{c:'yin',e:'🎵',w:'音',read:'因'},{c:'yun',e:'☁️',w:'云',read:'晕'},{c:'ying',e:'🦅',w:'鹰',read:'英'}
 ];
 
 const CATS = ['单韵母','复韵母','前鼻韵母','后鼻韵母'];
@@ -620,7 +620,7 @@ function renderMap(){
 /* ---------- 卡片墙 ---------- */
 function renderShengCards(){
   $('sheng-cards').innerHTML = SHENGMU.map(x=>`
-    <button class="card" onclick="speak('${x.w}')">
+    <button class="card" onclick="speak('${x.read}')">
       <span class="card-emoji">${x.e}</span>
       <span class="card-letter">${x.c}</span>
       <span class="card-word">${x.w}</span>
@@ -633,7 +633,7 @@ function renderYunCards(){
       <div class="group-title" style="color:${GROUP_COLORS[g.group]};">${g.group}（${g.items.length}个）</div>
       <div class="cards">`;
     html += g.items.map(x=>`
-      <button class="card" onclick="speak('${x.w}')">
+      <button class="card" onclick="speak('${x.read}')">
         <span class="card-emoji">${x.e}</span>
         <span class="card-letter">${x.c}</span>
         <span class="card-word">${x.w}</span>
@@ -645,7 +645,7 @@ function renderYunCards(){
 }
 function renderZhengtCards(){
   $('zhengt-cards').innerHTML = ZHENGTI.map(x=>`
-    <button class="card" onclick="speak('${x.w}')">
+    <button class="card" onclick="speak('${x.read}')">
       <span class="card-emoji">${x.e}</span>
       <span class="card-letter">${x.c}</span>
       <span class="card-word">${x.w}</span>
