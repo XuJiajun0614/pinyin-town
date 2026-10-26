@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>拼音小镇大冒险</title>
+<style>
+  :root{
+    --blue:#3b82f6; --pink:#ec4899; --green:#22c55e; --orange:#f97316; --purple:#8b5cf6;
+    --ink:#333; --muted:#7a7a7a; --card:#fff; --gold:#f5b301;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0; font-family:"PingFang SC","Microsoft YaHei","微软雅黑",system-ui,sans-serif;
+    background:linear-gradient(180deg,#e7f3ff 0%,#fff0f6 60%,#fef9e7 100%);
+    min-height:100vh; color:var(--ink);
+  }
+  header{
+    position:sticky; top:0; z-index:20; background:#fff; box-shadow:0 2px 12px rgba(0,0,0,.08);
+    display:flex; align-items:center; justify-content:space-between; padding:10px 20px;
+  }
+  header .logo{font-size:20px; font-weight:800;}
+  header .stars{font-size:18px; font-weight:800; color:var(--gold);}
+  main{max-width:880px; margin:0 auto; padding:18px 14px 80px;}
+  .screen{display:none;}
+  .screen.active{display:block; animation:fadein .4s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+
+  .panel{background:var(--card); border-radius:22px; padding:20px; box-shadow:0 8px 26px rgba(60,60,90,.10); margin-bottom:16px;}
+  .panel h2{margin:0 0 8px; font-size:24px;}
+  .story{background:#fff7e6; border-left:6px solid var(--orange); border-radius:14px; padding:14px 16px; line-height:1.9; font-size:17px; margin:12px 0;}
+  .story b{color:#d97706;}
+
+  h1.title{font-size:30px; text-align:center; margin:6px 0 2px;}
+  .subtitle{text-align:center; color:var(--muted); font-size:15px; margin:0 0 6px;}
+
+  /* 地图 */
+  #map-cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-top:14px;}
+  .house{background:var(--card); border-radius:20px; padding:16px 10px; text-align:center; cursor:pointer;
+    border:3px solid transparent; box-shadow:0 6px 18px rgba(60,60,90,.10); transition:transform .15s;}
+  .house:hover{transform:translateY(-4px);}
+  .house .ico{font-size:44px;}
+  .house .nm{font-size:17px; font-weight:800; margin:4px 0;}
+  .house .desc{font-size:12px; color:var(--muted);}
+  .house .done{font-size:20px; margin-top:2px; height:24px;}
+  .name-box{text-align:center; margin:14px 0 4px; font-size:16px;}
+  .name-box input{border:2px solid #ddd; border-radius:12px; padding:8px 12px; font-size:16px; width:180px; text-align:center;}
+
+  /* 卡片墙 */
+  .cards{display:flex; flex-wrap:wrap; gap:10px; margin:10px 0;}
+  .card{background:#f8fafc; border:2px solid #eef2f6; border-radius:16px; padding:10px 12px; cursor:pointer;
+    min-width:74px; text-align:center; transition:transform .1s;}
+  .card:hover{transform:scale(1.06); border-color:#c7d6ea;}
+  .card .card-emoji{font-size:26px; display:block;}
+  .card .card-letter{font-size:22px; font-weight:800; color:#1d4ed8; display:block;}
+  .card .card-word{font-size:13px; color:var(--muted);}
+  .card .card-py{font-size:12px; color:#999;}
+  .group-title{font-weight:800; font-size:15px; color:#475569; margin:12px 0 2px;}
+
+  /* 按钮 */
+  .btn{display:inline-block; border:none; cursor:pointer; border-radius:16px; padding:12px 22px;
+    font-size:17px; font-weight:800; color:#fff; box-shadow:0 5px 14px rgba(0,0,0,.12); transition:transform .1s;}
+  .btn:active{transform:scale(.96);}
+  .btn-big{font-size:19px; padding:14px 28px;}
+  .btn-blue{background:var(--blue);} .btn-pink{background:var(--pink);}
+  .btn-green{background:var(--green);} .btn-orange{background:var(--orange);} .btn-purple{background:var(--purple);}
+  .btn-ghost{background:#fff; color:var(--ink); border:2px solid #e2e8f0; box-shadow:none;}
+  .nav-row{display:flex; justify-content:space-between; gap:10px; margin-top:14px; flex-wrap:wrap;}
+
+  /* 游戏通用 */
+  .game-stage{text-align:center;}
+  .big-emoji{font-size:72px; line-height:1;}
+  .big-letter{font-size:60px; font-weight:900; color:#1d4ed8;}
+  .big-word{font-size:30px; font-weight:800; margin:6px 0;}
+  .hint{color:var(--muted); font-size:14px; margin:6px 0;}
+  .feedback{min-height:26px; font-size:18px; font-weight:800; margin:8px 0;}
+  .feedback.good{color:var(--green);} .feedback.bad{color:#ef4444;}
+
+  /* 游戏1 翻翻乐 */
+  #g1-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; max-width:560px; margin:10px auto;}
+  .g1-card{aspect-ratio:1/1; border-radius:16px; border:2px solid #e2e8f0; background:#eef4ff; cursor:pointer;
+    font-size:34px; font-weight:800; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:transform .2s;}
+  .g1-card.flipped,.g1-card.matched{background:#fff; border-color:#3b82f6;}
+  .g1-card.matched{background:#dcfce7; border-color:#22c55e; cursor:default; animation:pop .35s ease;}
+  .g1-card .card-back{color:#94a3b8;}
+  .g1-card .big-letter{font-size:46px;}
+  .g1-card .sub-word{font-size:13px; color:var(--muted);}
+  @keyframes pop{0%{transform:scale(.8);}60%{transform:scale(1.12);}100%{transform:scale(1);}}
+
+  /* 游戏2 拼一拼 */
+  .blend-row{display:flex; align-items:center; justify-content:center; gap:10px; margin:10px 0; flex-wrap:wrap;}
+  .tile{background:#eef4ff; border:3px solid #93c5fd; border-radius:16px; padding:10px 16px; font-size:34px; font-weight:900; color:#1d4ed8;}
+  .tile.plus{font-size:30px; color:var(--muted); border:none; background:none;}
+  .tile.q{background:#fff; border-style:dashed; color:#cbd5e1;}
+  #g2-opts{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin:10px 0;}
+  .g2-opt{font-size:30px; font-weight:900; padding:12px 22px; border-radius:16px; border:3px solid #e2e8f0; background:#fff; cursor:pointer; transition:transform .1s;}
+  .g2-opt:hover{transform:scale(1.06); border-color:#3b82f6;}
+  .wiggle{animation:wiggle .4s;}
+  @keyframes wiggle{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-5px);}80%{transform:translateX(5px);}}
+
+  /* 游戏3 抓音节 */
+  #g3-grid{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:560px; margin:10px auto;}
+  .g3-tile{font-size:22px; font-weight:800; padding:12px 14px; border-radius:14px; border:2px solid #e2e8f0; background:#fff; cursor:pointer; transition:transform .1s;}
+  .g3-tile.caught{background:#dcfce7; border-color:#22c55e; color:#16a34a; cursor:default; animation:pop .3s;}
+  .g3-tile.bad{animation:wiggle .4s; border-color:#ef4444;}
+
+  /* 游戏4 声调 */
+  #g4-tones{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin:12px 0;}
+  .tone-btn{font-size:34px; font-weight:900; width:72px; height:72px; border-radius:16px; border:3px solid #e2e8f0; background:#fff; cursor:pointer; transition:transform .1s;}
+  .tone-btn:hover{transform:scale(1.1);}
+  .tone-btn small{display:block; font-size:12px; color:var(--muted); font-weight:600;}
+
+  /* 大闯关 & 奖状 */
+  #final-stage .quiz-q{font-size:22px; font-weight:800; margin:10px 0 14px;}
+  .quiz-opts{display:flex; gap:14px; justify-content:center; flex-wrap:wrap;}
+  .quiz-opt{font-size:26px; font-weight:900; padding:14px 24px; border-radius:16px; border:3px solid #e2e8f0; background:#fff; cursor:pointer;}
+  .certificate{border:6px solid var(--gold); border-radius:24px; background:#fffdf5; padding:30px 20px; text-align:center; position:relative; overflow:hidden;}
+  .certificate h2{font-size:32px; color:#b45309; margin:0 0 6px;}
+  .certificate .medal{font-size:80px;}
+  .certificate .name{font-size:34px; font-weight:900; color:#d97706; margin:8px 0;}
+  .certificate .stars-line{font-size:34px; letter-spacing:6px; margin:10px 0;}
+
+  .toast{position:fixed; top:80px; left:50%; transform:translateX(-50%); background:#333; color:#fff;
+    padding:12px 22px; border-radius:30px; font-size:18px; font-weight:800; opacity:0; transition:opacity .3s; z-index:999;}
+  .toast.show{opacity:1;}
+
+  .confetti{position:fixed; top:-12vh; z-index:1000; pointer-events:none; animation:fall linear forwards;}
+  @keyframes fall{to{transform:translateY(115vh) rotate(360deg);}}
+
+  .foot{text-align:center; color:var(--muted); font-size:12px; margin-top:20px;}
+  @media (max-width:520px){
+    #g1-grid{grid-template-columns:repeat(3,1fr);}
+    .big-emoji{font-size:56px;} .big-letter{font-size:44px;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🏘️ 拼音小镇大冒险</div>
+  <div class="stars">⭐ <span id="star-count">0</span> / 5</div>
+</header>
+
+<main>
+
+  <!-- 地图 -->
+  <section id="screen-map" class="screen active">
+    <h1 class="title">🏘️ 拼音小镇大冒险</h1>
+    <p class="subtitle">跟着小勇士一起,拜访拼音小镇的三户人家吧!</p>
+    <div class="panel">
+      <div class="story">
+        📖 <b>开场:</b>欢迎来到<B>拼音小镇</B>!这里住着三户人家——<b>声母屋、韵母屋、整体认读音节屋</b>。
+        每一家都藏着拼音的宝贝。今天,你就是来小镇探险的<b>小勇士</b>!
+        只要完成每个屋子的游戏,就能得到<b>⭐星星</b>,集满星星就能拿到<b>拼音小勇士奖状</b>哦!
+      </div>
+      <div class="name-box">
+        👦 小朋友,你叫什么名字?
+        <input id="name-input" placeholder="输入你的名字" maxlength="8">
+      </div>
+      <div id="map-cards"></div>
+    </div>
+    <p class="foot">💡 小贴士:让老师(家长)把故事和题目读出来,小朋友来动手点击就好啦!</p>
+  </section>
+
+  <!-- 声母屋 -->
+  <section id="screen-sheng" class="screen">
+    <div class="panel">
+      <h2>🔵 第一站:声母屋</h2>
+      <div class="story">
+        📖 蓝色的<b>声母屋</b>到啦!声母们像勇敢的<b>排头兵</b>,总是站在一个音节的最前面,给它"打头阵"。
+        声母一共有 <b>23 个</b>。可是它们有点害羞,躲进图片里了。点一点每张卡片,认识它们吧!
+      </div>
+      <div id="sheng-cards" class="cards"></div>
+    </div>
+
+    <div class="panel game-stage">
+      <h3>🎮 游戏一:帮声母找朋友</h3>
+      <div class="hint">翻开卡片,给声母找到它的图片朋友(比如 <b>b</b> 和 🍍 菠萝是一对)。</div>
+      <button class="btn btn-blue" id="btn-start-g1">▶ 开始游戏</button>
+      <div id="g1-grid"></div>
+      <div class="feedback" id="g1-feedback"></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost go-map">🏠 返回地图</button>
+      <button class="btn btn-pink" data-go="screen-yun">下一站:韵母屋 →</button>
+    </div>
+  </section>
+
+  <!-- 韵母屋 -->
+  <section id="screen-yun" class="screen">
+    <div class="panel">
+      <h2>🩷 第二站:韵母屋</h2>
+      <div class="story">
+        📖 粉色的<b>韵母屋</b>到啦!韵母是拼音里的<b>歌唱家</b>,它们让音节发出好听的声音,还背着<b>声调小帽子</b>。
+        韵母一共有 <b>24 个</b>,分成四组:单韵母、复韵母、前鼻韵母、后鼻韵母。
+      </div>
+      <div id="yun-cards" class="cards"></div>
+    </div>
+
+    <div class="panel game-stage">
+      <h3>🎮 游戏二:拼一拼</h3>
+      <div class="hint">看图片,把「声母」和正确的「韵母」拼在一起。</div>
+      <button class="btn btn-pink" id="btn-start-g2">▶ 开始游戏</button>
+      <div id="g2-stage" style="display:none;">
+        <div class="big-emoji" id="g2-img"></div>
+        <div class="big-word" id="g2-word"></div>
+        <div class="blend-row">
+          <span class="tile" id="g2-init"></span>
+          <span class="tile plus">+</span>
+          <span class="tile q">?</span>
+          <span class="tile plus">=</span>
+          <span class="tile q">?</span>
+        </div>
+        <div class="hint" id="g2-progress"></div>
+        <div id="g2-opts"></div>
+        <div class="feedback" id="g2-feedback"></div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost go-map">🏠 返回地图</button>
+      <button class="btn btn-green" data-go="screen-zhengt">下一站:整体认读音节屋 →</button>
+    </div>
+  </section>
+
+  <!-- 整体认读音节屋 -->
+  <section id="screen-zhengt" class="screen">
+    <div class="panel">
+      <h2>🟢 第三站:整体认读音节屋</h2>
+      <div class="story">
+        📖 绿色的<b>整体认读音节屋</b>到啦!这里的音节最特别——<b>不用拼</b>,看到一个就要直接读出来!
+        它们像一个个约定好的小伙伴,一共有 <b>16 个</b>。
+      </div>
+      <div id="zhengt-cards" class="cards"></div>
+    </div>
+
+    <div class="panel game-stage">
+      <h3>🎮 游戏三:抓住整体认读音节</h3>
+      <div class="hint">请把所有「整体认读音节」点出来,抓进小篮子!(不是的会摇摇头哦)</div>
+      <button class="btn btn-green" id="btn-start-g3">▶ 开始游戏</button>
+      <div class="hint" id="g3-count" style="display:none;">已抓到 0 / 16</div>
+      <div id="g3-grid"></div>
+      <div class="feedback" id="g3-feedback"></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost go-map">🏠 返回地图</button>
+      <button class="btn btn-orange" data-go="screen-tone">下一站:声调擂台 →</button>
+    </div>
+  </section>
+
+  <!-- 声调擂台 -->
+  <section id="screen-tone" class="screen">
+    <div class="panel">
+      <h2>🟠 声调擂台</h2>
+      <div class="story">
+        📖 拼音还有四个<b>声调小帽子</b>:<br>
+        <b>一声平</b>(—)、<b>二声扬</b>(／)、<b>三声拐弯</b>(∨)、<b>四声降</b>(＼)。<br>
+        来试试给字戴上正确的帽子吧!
+      </div>
+    </div>
+
+    <div class="panel game-stage">
+      <button class="btn btn-orange" id="btn-start-g4">▶ 开始游戏</button>
+      <div id="g4-stage" style="display:none;">
+        <div class="big-emoji" id="g4-img"></div>
+        <div class="big-word" id="g4-word"></div>
+        <div class="big-word" id="g4-py"></div>
+        <div class="hint" id="g4-progress"></div>
+        <div id="g4-tones">
+          <button class="tone-btn" data-t="0">ā<small>一声平</small></button>
+          <button class="tone-btn" data-t="1">á<small>二声扬</small></button>
+          <button class="tone-btn" data-t="2">ǎ<small>三声拐弯</small></button>
+          <button class="tone-btn" data-t="3">à<small>四声降</small></button>
+        </div>
+        <div class="feedback" id="g4-feedback"></div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost go-map">🏠 返回地图</button>
+      <button class="btn btn-purple" data-go="screen-final">最后一关:大闯关 →</button>
+    </div>
+  </section>
+
+  <!-- 大闯关 & 奖状 -->
+  <section id="screen-final" class="screen">
+    <div class="panel">
+      <h2>🟣 大闯关</h2>
+      <div class="story">📖 小勇士,把前面学到的本领都用出来,闯过最后一关吧!</div>
+      <div class="game-stage">
+        <button class="btn btn-purple" id="btn-start-final">▶ 开始闯关</button>
+        <div id="final-stage" style="display:none;">
+          <div class="quiz-q" id="final-q"></div>
+          <div class="hint" id="final-progress"></div>
+          <div class="quiz-opts" id="final-opts"></div>
+          <div class="feedback" id="final-feedback"></div>
+        </div>
+      </div>
+    </div>
+    <div id="certificate" class="certificate" style="display:none;">
+      <div class="medal">🏅</div>
+      <h2>奖 状</h2>
+      <div class="name" id="cert-name">小朋友</div>
+      <div style="font-size:16px;color:#666;">同学在「拼音小镇大冒险」中表现优秀</div>
+      <div style="font-size:16px;color:#666;">认识了声母、韵母、整体认读音节,并学会了声调</div>
+      <div class="stars-line" id="cert-stars">⭐⭐⭐⭐⭐</div>
+      <div style="font-size:18px;font-weight:800;color:#b45309;">特发此状,以资鼓励!</div>
+      <div style="margin-top:16px;">
+        <button class="btn btn-purple" id="btn-replay">🔄 再玩一次</button>
+      </div>
+    </div>
+    <div class="nav-row" id="final-nav">
+      <button class="btn btn-ghost go-map">🏠 返回地图</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ---------- 数据 ---------- */
+const SHENGMU = [
+  {c:'b',e:'🍍',w:'菠萝'},{c:'p',e:'🍎',w:'苹果'},{c:'m',e:'👩',w:'妈妈'},{c:'f',e:'🪁',w:'风筝'},
+  {c:'d',e:'🌳',w:'大树'},{c:'t',e:'🐰',w:'兔子'},{c:'n',e:'🥛',w:'牛奶'},{c:'l',e:'🐯',w:'老虎'},
+  {c:'g',e:'🕊️',w:'鸽子'},{c:'k',e:'🐸',w:'蝌蚪'},{c:'h',e:'🦛',w:'河马'},{c:'j',e:'🥚',w:'鸡蛋'},
+  {c:'q',e:'🎈',w:'气球'},{c:'x',e:'🍉',w:'西瓜'},{c:'zh',e:'🕷️',w:'蜘蛛'},{c:'ch',e:'🏯',w:'长城'},
+  {c:'sh',e:'🦁',w:'狮子'},{c:'r',e:'🌅',w:'日出'},{c:'z',e:'🟣',w:'紫色'},{c:'c',e:'🍓',w:'草莓'},
+  {c:'s',e:'🥒',w:'丝瓜'},{c:'y',e:'👕',w:'衣服'},{c:'w',e:'🐦',w:'乌鸦'}
+];
+const YUNMU = [
+  {group:'单韵母',items:[
+    {c:'a',e:'8️⃣',w:'八',py:'bā'},{c:'o',e:'🙋',w:'我',py:'wǒ'},{c:'e',e:'🦢',w:'鹅',py:'é'},
+    {c:'i',e:'1️⃣',w:'一',py:'yī'},{c:'u',e:'5️⃣',w:'五',py:'wǔ'},{c:'ü',e:'🐟',w:'鱼',py:'yú'}]},
+  {group:'复韵母',items:[
+    {c:'ai',e:'❤️',w:'爱',py:'ài'},{c:'ei',e:'👧',w:'妹',py:'mèi'},{c:'ui',e:'💧',w:'水',py:'shuǐ'},
+    {c:'ao',e:'🎒',w:'包',py:'bāo'},{c:'ou',e:'✋',w:'手',py:'shǒu'},{c:'iu',e:'🐮',w:'牛',py:'niú'},
+    {c:'ie',e:'🍃',w:'叶',py:'yè'},{c:'üe',e:'🌙',w:'月',py:'yuè'},{c:'er',e:'👂',w:'耳',py:'ěr'}]},
+  {group:'前鼻韵母',items:[
+    {c:'an',e:'⛰️',w:'山',py:'shān'},{c:'en',e:'🚪',w:'门',py:'mén'},{c:'in',e:'🥇',w:'金',py:'jīn'},
+    {c:'un',e:'🌸',w:'春',py:'chūn'},{c:'ün',e:'☁️',w:'云',py:'yún'}]},
+  {group:'后鼻韵母',items:[
+    {c:'ang',e:'🍬',w:'糖',py:'táng'},{c:'eng',e:'💡',w:'灯',py:'dēng'},{c:'ing',e:'⭐',w:'星',py:'xīng'},
+    {c:'ong',e:'🔴',w:'红',py:'hóng'}]}
+];
+const ZHENGTI = [
+  {c:'zhi',e:'🧠',w:'知'},{c:'chi',e:'🍚',w:'吃'},{c:'shi',e:'🦁',w:'狮'},{c:'ri',e:'☀️',w:'日'},
+  {c:'zi',e:'📝',w:'字'},{c:'ci',e:'📖',w:'词'},{c:'si',e:'4️⃣',w:'四'},{c:'yi',e:'1️⃣',w:'一'},
+  {c:'wu',e:'5️⃣',w:'五'},{c:'yu',e:'🐟',w:'鱼'},{c:'ye',e:'🍃',w:'叶'},{c:'yue',e:'🌙',w:'月'},
+  {c:'yuan',e:'⚪',w:'圆'},{c:'yin',e:'🎵',w:'音'},{c:'yun',e:'☁️',w:'云'},{c:'ying',e:'🦅',w:'鹰'}
+];
+const G1_PAIRS = SHENGMU.slice(0,6);           // b p m f d t
+const G2_Q = [
+  {e:'👨',w:'爸',init:'b',ans:'à',opts:['à','ā','ǎ']},
+  {e:'🐴',w:'马',init:'m',ans:'ǎ',opts:['ǎ','ā','à']},
+  {e:'🐰',w:'兔',init:'t',ans:'ù',opts:['ù','ū','ú']},
+  {e:'🍐',w:'梨',init:'l',ans:'í',opts:['í','ī','ǐ']},
+  {e:'🐱',w:'猫',init:'m',ans:'āo',opts:['āo','ou','ān']},
+  {e:'✋',w:'手',init:'sh',ans:'ǒu',opts:['ǒu','òu','ǎo']},
+  {e:'☀️',w:'天',init:'t',ans:'iān',opts:['iān','ān','īn']},
+  {e:'💡',w:'灯',init:'d',ans:'ēng',opts:['ēng','ēn','āng']}
+];
+const G3_DISTRACTORS = ['ba','ma','pa','de','le','ke','bo','po'];
+const G4_Q = [
+  {e:'8️⃣',w:'八',py:'bā',t:0},
+  {e:'💪',w:'拔',py:'bá',t:1},
+  {e:'🤲',w:'把',py:'bǎ',t:2},
+  {e:'👨',w:'爸',py:'bà',t:3}
+];
+const FINAL_Q = [
+  {q:'哪个是声母?',opts:['b','a','zhi'],ans:0},
+  {q:'哪个是韵母?',opts:['m','ang','shi'],ans:1},
+  {q:'哪个是整体认读音节?',opts:['ying','ba','ku'],ans:0},
+  {q:'b + a 拼在一起,读作?',opts:['ba','bo','bu'],ans:0},
+  {q:'「妈」的声调是第几声?',opts:['ā','á','à'],ans:0}
+];
+
+/* ---------- 工具 ---------- */
+const $ = id => document.getElementById(id);
+function shuffle(a){const arr=[...a];for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function speak(text){
+  try{
+    if(!('speechSynthesis' in window)) return;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang='zh-CN'; u.rate=0.8;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }catch(e){}
+}
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function toast(msg){
+  const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>{t.classList.remove('show'); setTimeout(()=>t.remove(),400);},2200);
+}
+function celebrate(){
+  const em=['🎉','⭐','🎈','✨','💖','🌟'];
+  for(let i=0;i<40;i++){
+    const s=document.createElement('span'); s.className='confetti';
+    s.textContent=em[Math.floor(Math.random()*em.length)];
+    s.style.left=Math.random()*100+'vw';
+    s.style.fontSize=(20+Math.random()*30)+'px';
+    s.style.animationDuration=(2+Math.random()*1.5)+'s';
+    s.style.animationDelay=(Math.random()*0.6)+'s';
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),4000);
+  }
+}
+
+/* ---------- 全局状态 ---------- */
+const state = {name:'小朋友', stars:0, done:{sheng:false,yun:false,zhengt:false,tone:false,final:false}};
+function addStar(key,label){
+  if(state.done[key]) return;
+  state.done[key]=true; state.stars++;
+  renderStars(); renderMap();
+  toast('⭐ 获得一颗星星!');
+  celebrate();
+}
+function renderStars(){ $('star-count').textContent = state.stars; }
+
+/* ---------- 地图 ---------- */
+function renderMap(){
+  const houses = [
+    {key:'sheng',id:'screen-sheng',ico:'🏠',nm:'声母屋',desc:'23个声母',color:'#3b82f6'},
+    {key:'yun',id:'screen-yun',ico:'🏠',nm:'韵母屋',desc:'24个韵母',color:'#ec4899'},
+    {key:'zhengt',id:'screen-zhengt',ico:'🏠',nm:'整体认读音节屋',desc:'16个整体认读音节',color:'#22c55e'},
+    {key:'tone',id:'screen-tone',ico:'🎵',nm:'声调擂台',desc:'四个声调',color:'#f97316'},
+    {key:'final',id:'screen-final',ico:'🏆',nm:'大闯关',desc:'拿奖状!',color:'#8b5cf6'}
+  ];
+  $('map-cards').innerHTML = houses.map(h=>`
+    <div class="house" data-go="${h.id}" style="border-color:${h.color};">
+      <div class="ico">${h.ico}</div>
+      <div class="nm" style="color:${h.color};">${h.nm}</div>
+      <div class="desc">${h.desc}</div>
+      <div class="done">${state.done[h.key]?'⭐':''}</div>
+    </div>`).join('');
+}
+
+/* ---------- 卡片墙 ---------- */
+function renderShengCards(){
+  $('sheng-cards').innerHTML = SHENGMU.map(x=>`
+    <button class="card" onclick="speak('${x.w}')">
+      <span class="card-emoji">${x.e}</span>
+      <span class="card-letter">${x.c}</span>
+      <span class="card-word">${x.w}</span>
+    </button>`).join('');
+}
+function renderYunCards(){
+  let html='';
+  YUNMU.forEach(g=>{
+    html += `<div class="group-title">${g.group}</div>`;
+    html += g.items.map(x=>`
+      <button class="card" onclick="speak('${x.w}')">
+        <span class="card-emoji">${x.e}</span>
+        <span class="card-letter">${x.c}</span>
+        <span class="card-word">${x.w}</span>
+        <span class="card-py">${x.py}</span>
+      </button>`).join('');
+  });
+  $('yun-cards').innerHTML = html;
+}
+function renderZhengtCards(){
+  $('zhengt-cards').innerHTML = ZHENGTI.map(x=>`
+    <button class="card" onclick="speak('${x.w}')">
+      <span class="card-emoji">${x.e}</span>
+      <span class="card-letter">${x.c}</span>
+      <span class="card-word">${x.w}</span>
+    </button>`).join('');
+}
+
+/* ---------- 游戏1:翻翻乐 ---------- */
+let g1={cards:[],first:null,lock:false,matched:0};
+function startGame1(){
+  const cards=[];
+  G1_PAIRS.forEach((p,i)=>{
+    cards.push({id:i,type:'letter',label:p.c,sub:'',matched:false,flipped:false});
+    cards.push({id:i,type:'pic',label:p.e,sub:p.w,matched:false,flipped:false});
+  });
+  g1.cards=shuffle(cards); g1.first=null; g1.lock=false; g1.matched=0;
+  $('g1-feedback').textContent=''; $('g1-feedback').className='feedback';
+  renderGame1();
+}
+function renderGame1(){
+  $('g1-grid').innerHTML = g1.cards.map((c,idx)=>{
+    let cls='g1-card'; let inner='<span class="card-back">?</span>';
+    if(c.flipped||c.matched){ cls += c.matched?' matched':' flipped'; inner = c.type==='letter'?`<span class="big-letter">${c.label}</span>`:`<span class="card-emoji" style="font-size:34px;">${c.label}</span><span class="sub-word">${c.sub}</span>`; }
+    return `<button class="${cls}" data-idx="${idx}">${inner}</button>`;
+  }).join('');
+}
+function onG1Click(idx){
+  const c=g1.cards[idx];
+  if(g1.lock||c.flipped||c.matched) return;
+  c.flipped=true;
+  if(g1.first===null){ g1.first=idx; renderGame1(); }
+  else{
+    const f=g1.cards[g1.first];
+    if(f.id===c.id){
+      f.matched=true; c.matched=true; g1.matched++; g1.first=null;
+      renderGame1();
+      if(g1.matched===G1_PAIRS.length){
+        $('g1-feedback').textContent='🎉 太棒了!所有声母都找到朋友啦!'; $('g1-feedback').className='feedback good';
+        addStar('sheng');
+      }
+    }else{
+      g1.lock=true; renderGame1();
+      setTimeout(()=>{f.flipped=false;c.flipped=false;g1.first=null;g1.lock=false;renderGame1();},800);
+    }
+  }
+}
+
+/* ---------- 游戏2:拼一拼 ---------- */
+let g2={idx:0,correct:0};
+function startGame2(){
+  g2.idx=0; g2.correct=0;
+  $('g2-stage').style.display='block';
+  $('g2-feedback').textContent=''; $('g2-feedback').className='feedback';
+  showG2Question();
+}
+function showG2Question(){
+  const q=G2_Q[g2.idx];
+  $('g2-img').textContent=q.e;
+  $('g2-word').textContent=q.w;
+  $('g2-init').textContent=q.init;
+  $('g2-progress').textContent=`第 ${g2.idx+1} / ${G2_Q.length} 题`;
+  $('g2-opts').innerHTML = shuffle(q.opts).map((o,i)=>`<button class="g2-opt" data-val="${o}">${o}</button>`).join('');
+  $('g2-feedback').textContent=''; $('g2-feedback').className='feedback';
+}
+function onG2Opt(btn){
+  const q=G2_Q[g2.idx];
+  if(btn.dataset.val===q.ans){
+    g2.correct++;
+    $('g2-feedback').textContent=`✅ 对啦! ${q.init} + ${q.ans} = ${q.init}${q.ans}`; $('g2-feedback').className='feedback good';
+    g2.idx++;
+    if(g2.idx>=G2_Q.length){
+      setTimeout(()=>{ $('g2-feedback').textContent='🎉 全部拼对啦!你真是拼读小高手!'; addStar('yun'); },600);
+    }else{
+      setTimeout(showG2Question,900);
+    }
+  }else{
+    btn.classList.add('wiggle'); setTimeout(()=>btn.classList.remove('wiggle'),450);
+    $('g2-feedback').textContent='再想一想哦~'; $('g2-feedback').className='feedback bad';
+  }
+}
+
+/* ---------- 游戏3:抓音节 ---------- */
+let g3={tiles:[],found:0};
+const ZHENGTI_SET = new Set(ZHENGTI.map(z=>z.c));
+function startGame3(){
+  const all=[...ZHENGTI.map(z=>z.c), ...G3_DISTRACTORS];
+  g3.tiles=shuffle(all).map(v=>({v,caught:false}));
+  g3.found=0;
+  $('g3-count').style.display='block';
+  $('g3-feedback').textContent=''; $('g3-feedback').className='feedback';
+  renderGame3();
+}
+function renderGame3(){
+  $('g3-count').textContent=`已抓到 ${g3.found} / ${ZHENGTI.length}`;
+  $('g3-grid').innerHTML = g3.tiles.map((t,i)=>{
+    const cls = t.caught ? 'g3-tile caught' : 'g3-tile';
+    return `<button class="${cls}" data-idx="${i}">${t.v}</button>`;
+  }).join('');
+}
+function onG3Tile(idx){
+  const t=g3.tiles[idx];
+  if(t.caught) return;
+  if(ZHENGTI_SET.has(t.v)){
+    t.caught=true; g3.found++; renderGame3();
+    if(g3.found===ZHENGTI.length){
+      $('g3-feedback').textContent='🎉 全部抓到了!整体认读音节都认识啦!'; $('g3-feedback').className='feedback good';
+      addStar('zhengt');
+    }
+  }else{
+    const btn=$('g3-grid').children[idx];
+    btn.classList.add('bad'); setTimeout(()=>{btn.classList.remove('bad'); renderGame3();},450);
+  }
+}
+
+/* ---------- 游戏4:声调 ---------- */
+let g4={order:[],idx:0,correct:0};
+function startGame4(){
+  g4.order=shuffle([0,1,2,3]); g4.idx=0; g4.correct=0;
+  $('g4-stage').style.display='block';
+  $('g4-feedback').textContent=''; $('g4-feedback').className='feedback';
+  showG4Question();
+}
+function showG4Question(){
+  const q=G4_Q[g4.order[g4.idx]];
+  $('g4-img').textContent=q.e;
+  $('g4-word').textContent=q.w;
+  $('g4-py').textContent=q.py;
+  $('g4-progress').textContent=`第 ${g4.idx+1} / 4 题`;
+  $('g4-feedback').textContent=''; $('g4-feedback').className='feedback';
+}
+function onG4Tone(btn){
+  const q=G4_Q[g4.order[g4.idx]];
+  if(Number(btn.dataset.t)===q.t){
+    g4.correct++;
+    $('g4-feedback').textContent=`✅ 对啦!${q.w} 读 ${q.py}`; $('g4-feedback').className='feedback good';
+    g4.idx++;
+    if(g4.idx>=4){
+      setTimeout(()=>{ $('g4-feedback').textContent='🎉 声调全对!帽子戴得真准!'; addStar('tone'); },600);
+    }else{
+      setTimeout(showG4Question,900);
+    }
+  }else{
+    btn.classList.add('wiggle'); setTimeout(()=>btn.classList.remove('wiggle'),450);
+    $('g4-feedback').textContent='再想想,是第几声呢?'; $('g4-feedback').className='feedback bad';
+  }
+}
+
+/* ---------- 大闯关 ---------- */
+let final={idx:0,correct:0};
+function startFinal(){
+  final.idx=0; final.correct=0;
+  $('final-stage').style.display='block';
+  $('final-feedback').textContent=''; $('final-feedback').className='feedback';
+  showFinalQuestion();
+}
+function showFinalQuestion(){
+  const q=FINAL_Q[final.idx];
+  $('final-q').textContent=q.q;
+  $('final-progress').textContent=`第 ${final.idx+1} / ${FINAL_Q.length} 题`;
+  $('final-opts').innerHTML = q.opts.map((o,i)=>`<button class="quiz-opt" data-i="${i}">${o}</button>`).join('');
+  $('final-feedback').textContent=''; $('final-feedback').className='feedback';
+}
+function onFinalOpt(btn){
+  const q=FINAL_Q[final.idx];
+  if(Number(btn.dataset.i)===q.ans){
+    final.correct++;
+    $('final-feedback').textContent='✅ 对啦!'; $('final-feedback').className='feedback good';
+    final.idx++;
+    if(final.idx>=FINAL_Q.length){
+      addStar('final');
+      setTimeout(showCertificate,900);
+    }else{
+      setTimeout(showFinalQuestion,900);
+    }
+  }else{
+    btn.classList.add('wiggle'); setTimeout(()=>btn.classList.remove('wiggle'),450);
+    $('final-feedback').textContent='再想一想哦~'; $('final-feedback').className='feedback bad';
+  }
+}
+function showCertificate(){
+  $('final-stage').style.display='none';
+  $('final-nav').style.display='none';
+  $('certificate').style.display='block';
+  $('cert-name').textContent=state.name;
+  const n=state.stars; const s='⭐'.repeat(Math.max(1,n));
+  $('cert-stars').textContent=s;
+  celebrate();
+}
+
+/* ---------- 初始化 ---------- */
+function init(){
+  renderStars();
+  renderMap();
+  renderShengCards();
+  renderYunCards();
+  renderZhengtCards();
+
+  // 名字
+  $('name-input').addEventListener('input',e=>{
+    state.name = e.target.value.trim() || '小朋友';
+  });
+
+  // 导航(委托)
+  document.addEventListener('click',e=>{
+    const nav=e.target.closest('[data-go]');
+    if(nav){ show(nav.dataset.go); return; }
+    if(e.target.closest('.go-map')){ show('screen-map'); return; }
+    const house=e.target.closest('.house');
+    if(house){ show(house.dataset.go); return; }
+  });
+
+  // 游戏1
+  $('btn-start-g1').addEventListener('click',startGame1);
+  $('g1-grid').addEventListener('click',e=>{
+    const b=e.target.closest('.g1-card'); if(b) onG1Click(Number(b.dataset.idx));
+  });
+
+  // 游戏2
+  $('btn-start-g2').addEventListener('click',startGame2);
+  $('g2-opts').addEventListener('click',e=>{
+    const b=e.target.closest('.g2-opt'); if(b) onG2Opt(b);
+  });
+
+  // 游戏3
+  $('btn-start-g3').addEventListener('click',startGame3);
+  $('g3-grid').addEventListener('click',e=>{
+    const b=e.target.closest('.g3-tile'); if(b) onG3Tile(Number(b.dataset.idx));
+  });
+
+  // 游戏4
+  $('btn-start-g4').addEventListener('click',startGame4);
+  $('g4-tones').addEventListener('click',e=>{
+    const b=e.target.closest('.tone-btn'); if(b) onG4Tone(b);
+  });
+
+  // 大闯关
+  $('btn-start-final').addEventListener('click',startFinal);
+  $('final-opts').addEventListener('click',e=>{
+    const b=e.target.closest('.quiz-opt'); if(b) onFinalOpt(b);
+  });
+
+  // 重玩
+  $('btn-replay').addEventListener('click',()=>location.reload());
+}
+init();
+</script>
+</body>
+</html>
