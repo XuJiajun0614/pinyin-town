@@ -31,6 +31,9 @@
   .panel h3{margin:6px 0 10px; font-size:20px;}
   .story{background:#fff7e6; border-left:6px solid var(--orange); border-radius:14px; padding:14px 16px; line-height:1.9; font-size:17px; margin:12px 0;}
   .story b{color:#d97706;}
+  .rule{background:#f5f3ff; border-left:6px solid var(--purple); border-radius:14px; padding:14px 16px; line-height:2; font-size:17px; margin:12px 0;}
+  .rule b{color:#7c3aed;}
+  .rule .ex{color:#7c3aed; font-weight:800;}
 
   h1.title{font-size:30px; text-align:center; margin:6px 0 2px;}
   .subtitle{text-align:center; color:var(--muted); font-size:15px; margin:0 0 6px;}
@@ -43,7 +46,7 @@
   .house .ico{font-size:44px;}
   .house .nm{font-size:17px; font-weight:800; margin:4px 0;}
   .house .desc{font-size:12px; color:var(--muted);}
-  .house .done{font-size:20px; margin-top:2px; height:24px;}
+  .house .done{font-size:18px; margin-top:2px; height:24px;}
   .name-box{text-align:center; margin:14px 0 4px; font-size:16px;}
   .name-box input{border:2px solid #ddd; border-radius:12px; padding:8px 12px; font-size:16px; width:180px; text-align:center;}
 
@@ -94,6 +97,11 @@
   .tone-btn:hover{transform:scale(1.1);}
   .tone-btn small{display:block; font-size:12px; color:var(--muted); font-weight:600;}
 
+  /* 标调 */
+  #g5-tiles{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:12px 0;}
+  .g5-tile{font-size:32px; font-weight:900; padding:10px 18px; border-radius:14px; border:3px solid #c7d6ea; background:#f8fafc; cursor:pointer; transition:transform .1s;}
+  .g5-tile:hover{transform:scale(1.08); border-color:#f97316;}
+
   /* 连线 */
   .g3-board{position:relative;}
   .g3-cols{display:flex; justify-content:space-between; gap:48px; position:relative; z-index:2;}
@@ -137,7 +145,7 @@
 <body>
 <header>
   <div class="logo">🏘️ 拼音小镇大冒险</div>
-  <div class="stars">⭐ <span id="star-count">0</span> / 5</div>
+  <div class="stars">⭐ <span id="star-count">0</span> / 7</div>
 </header>
 
 <main>
@@ -148,10 +156,10 @@
     <p class="subtitle">跟着小勇士一起,拜访拼音小镇的三户人家吧!</p>
     <div class="panel">
       <div class="story">
-        📖 <b>开场:</b>欢迎来到<B>拼音小镇</B>!这里住着三户人家——<b>韵母屋、声母屋、整体认读音节屋</b>。
-        每一家都藏着拼音的宝贝。今天,你就是来小镇探险的<b>小勇士</b>!
-        我们第一站先去听<b>韵母</b>唱歌,再去拜访<b>声母</b>排头兵。完成每个屋子的游戏,就能得到<b>⭐星星</b>,
-        集满 5 颗星星,就能拿到<b>拼音小勇士奖状</b>哦!
+        📖 <b>开场:</b>欢迎来到<B>拼音小镇</B>!这里住着三户人家——<b>韵母屋、声母屋、整体认读音节屋</b>,
+        还有<b>声调擂台</b>和<b>魔法拼写屋</b>等着你!每一家都藏着拼音的宝贝。
+        今天,你就是来小镇探险的<b>小勇士</b>!完成每个屋子的游戏,就能得到<b>⭐星星</b>,
+        集满 7 颗星星,就能拿到<b>拼音小勇士奖状</b>哦!
       </div>
       <div class="name-box">
         👦 小朋友,你叫什么名字?
@@ -268,12 +276,21 @@
       <h2>🟠 第四站:声调擂台</h2>
       <div class="story">
         📖 拼音还有四个<b>声调小帽子</b>:<br>
-        <b>一声平</b>(—)、<b>二声扬</b>(／)、<b>三声拐弯</b>(∨)、<b>四声降</b>(＼)。<br>
-        看拼音的声调符号,说出它是第几声吧!
+        <b>一声平</b>(—)、<b>二声扬</b>(／)、<b>三声拐弯</b>(∨)、<b>四声降</b>(＼)。
+      </div>
+      <div class="story">
+        📖 <b>标调规则小口诀:</b><br>
+        四个声调四顶帽，六个单韵母抢着要 —— <b>a o e i u ü</b><br>
+        有 a 在，把帽戴；<br>
+        a 不在，o e 戴；<br>
+        要是 i u 在一起，谁在后面给谁戴。<br>
+        <span style="color:#d97706;">例:huā(戴在a) · shǒu(戴在o) · niú(戴在u)</span>
       </div>
     </div>
 
     <div class="panel game-stage">
+      <h3>🎮 游戏:第几声?</h3>
+      <div class="hint">看拼音的声调符号,说出它是第几声!</div>
       <button class="btn btn-orange" id="btn-start-g4">▶ 开始游戏(共20题)</button>
       <div id="g4-stage" style="display:none;">
         <div class="big-emoji" id="g4-img"></div>
@@ -289,16 +306,65 @@
         <div class="feedback" id="g4-feedback"></div>
       </div>
     </div>
+
+    <div class="panel game-stage">
+      <h3>🎮 游戏:给谁戴帽子?</h3>
+      <div class="hint">看这个字,声调的帽子该戴在哪个字母上?点那个字母!</div>
+      <button class="btn btn-orange" id="btn-start-g5">▶ 开始游戏</button>
+      <div id="g5-stage" style="display:none;">
+        <div class="big-emoji" id="g5-img"></div>
+        <div class="big-word" id="g5-word"></div>
+        <div class="hint" id="g5-progress"></div>
+        <div id="g5-tiles"></div>
+        <div class="big-word" id="g5-answer" style="color:#d97706;min-height:40px;"></div>
+        <div class="feedback" id="g5-feedback"></div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost go-map">🏠 返回地图</button>
+      <button class="btn btn-purple" data-go="screen-special">下一站:魔法拼写屋 →</button>
+    </div>
+  </section>
+
+  <!-- 魔法拼写屋(第五站) -->
+  <section id="screen-special" class="screen">
+    <div class="panel">
+      <h2>✨ 第五站:魔法拼写屋</h2>
+      <div class="rule">
+        📖 拼音里有几个<b>淘气的小魔法</b>,记住它们:<br>
+        ① j q x 真稀奇，见了 a 和 ao，需要 i 联系:<br>
+        &nbsp;&nbsp;<span class="ex">j + ia = jia　q + ia = qia　x + ia = xia</span><br>
+        &nbsp;&nbsp;<span class="ex">j + iao = jiao　q + iao = qiao　x + iao = xiao</span><br>
+        ② j q x y 真淘气，从不和 u 在一起。<br>
+        ③ ü 见了 j q x 和 y，摘掉帽子行个礼:<br>
+        &nbsp;&nbsp;<span class="ex">jü→ju　qü→qu　xü→xu　yü→yu</span><br>
+        ④ n、l 见到 ü，一定不能摘帽子:<br>
+        &nbsp;&nbsp;<span class="ex">n + ü = nü(女)　l + ü = lü(绿)</span>
+      </div>
+    </div>
+
+    <div class="panel game-stage">
+      <h3>🎮 游戏:ü 摘不摘帽子?</h3>
+      <div class="hint">看这个字,选出正确的拼音写法!(注意 ü 的两点到底摘没摘)</div>
+      <button class="btn btn-purple" id="btn-start-g6">▶ 开始游戏</button>
+      <div id="g6-stage" style="display:none;">
+        <div class="big-emoji" id="g6-img"></div>
+        <div class="big-word" id="g6-word" style="cursor:pointer;" title="点我听发音"></div>
+        <div class="hint" id="g6-progress"></div>
+        <div class="opts" id="g6-opts"></div>
+        <div class="feedback" id="g6-feedback"></div>
+      </div>
+    </div>
     <div class="nav-row">
       <button class="btn btn-ghost go-map">🏠 返回地图</button>
       <button class="btn btn-purple" data-go="screen-final">最后一关:大闯关 →</button>
     </div>
   </section>
 
-  <!-- 大闯关(第五站) -->
+  <!-- 大闯关(第六站) -->
   <section id="screen-final" class="screen">
     <div class="panel">
-      <h2>🟣 第五站:大闯关</h2>
+      <h2>🟣 第六站:大闯关</h2>
       <div class="story">📖 小勇士,把前面学到的本领都用出来,闯过最后一关吧!(共 20 题,每次题目会变)</div>
       <div class="game-stage">
         <button class="btn btn-purple" id="btn-start-final">▶ 开始闯关(共20题)</button>
@@ -315,7 +381,7 @@
       <h2>奖 状</h2>
       <div class="name" id="cert-name">小朋友</div>
       <div style="font-size:16px;color:#666;">同学在「拼音小镇大冒险」中表现优秀</div>
-      <div style="font-size:16px;color:#666;">认识了韵母、声母、整体认读音节,并学会了声调</div>
+      <div style="font-size:16px;color:#666;">认识了韵母、声母、整体认读音节,学会了声调与拼写规则</div>
       <div class="stars-line" id="cert-stars">⭐⭐⭐⭐⭐</div>
       <div style="font-size:18px;font-weight:800;color:#b45309;">特发此状,以资鼓励!</div>
       <div style="margin-top:16px;">
@@ -410,7 +476,45 @@ const G4_BANK = [
   {e:'🌳',w:'树',py:'shù',t:3},{e:'🥚',w:'蛋',py:'dàn',t:3},{e:'🌍',w:'地',py:'dì',t:3}
 ];
 
-// 大闯关题库(24 题,每次随机抽 20)
+// 标调(给谁戴帽子)题库(18 题,每次随机抽 12)
+const BIAODIAO_BANK = [
+  {e:'🌸',w:'花',tiles:['h','u','a'],ans:'a',full:'huā'},
+  {e:'🐱',w:'猫',tiles:['m','a','o'],ans:'a',full:'māo'},
+  {e:'✋',w:'手',tiles:['sh','o','u'],ans:'o',full:'shǒu'},
+  {e:'🐮',w:'牛',tiles:['n','i','u'],ans:'u',full:'niú'},
+  {e:'💧',w:'水',tiles:['sh','u','i'],ans:'i',full:'shuǐ'},
+  {e:'☀️',w:'天',tiles:['t','i','a','n'],ans:'a',full:'tiān'},
+  {e:'💡',w:'灯',tiles:['d','e','ng'],ans:'e',full:'dēng'},
+  {e:'🔴',w:'红',tiles:['h','o','ng'],ans:'o',full:'hóng'},
+  {e:'⚪',w:'白',tiles:['b','a','i'],ans:'a',full:'bái'},
+  {e:'🪁',w:'飞',tiles:['f','e','i'],ans:'e',full:'fēi'},
+  {e:'6️⃣',w:'六',tiles:['l','i','u'],ans:'u',full:'liù'},
+  {e:'⚽',w:'球',tiles:['q','i','u'],ans:'u',full:'qiú'},
+  {e:'☕',w:'杯',tiles:['b','e','i'],ans:'e',full:'bēi'},
+  {e:'📏',w:'高',tiles:['g','a','o'],ans:'a',full:'gāo'},
+  {e:'⭐',w:'星',tiles:['x','i','ng'],ans:'i',full:'xīng'},
+  {e:'🌸',w:'春',tiles:['ch','u','n'],ans:'u',full:'chūn'},
+  {e:'☁️',w:'云',tiles:['y','u','n'],ans:'u',full:'yún'},
+  {e:'🌙',w:'月',tiles:['y','u','e'],ans:'e',full:'yuè'}
+];
+
+// 魔法拼写(ü 摘不摘帽子)题库(12 题)
+const SPECIAL_BANK = [
+  {e:'🐟',w:'鱼',opts:['yu','yü'],ans:0},
+  {e:'🌙',w:'月',opts:['yue','yüe'],ans:0},
+  {e:'☁️',w:'云',opts:['yun','yün'],ans:0},
+  {e:'⚪',w:'圆',opts:['yuan','yüan'],ans:0},
+  {e:'🍊',w:'橘',opts:['ju','jü'],ans:0},
+  {e:'🚶',w:'去',opts:['qu','qü'],ans:0},
+  {e:'❄️',w:'雪',opts:['xue','xüe'],ans:0},
+  {e:'🎵',w:'曲',opts:['qu','qü'],ans:0},
+  {e:'👧',w:'女',opts:['nǚ','nu'],ans:0},
+  {e:'🟢',w:'绿',opts:['lǜ','lu'],ans:0},
+  {e:'🐴',w:'驴',opts:['lǘ','lu'],ans:0},
+  {e:'🧳',w:'旅',opts:['lǚ','lu'],ans:0}
+];
+
+// 大闯关题库(30 题,每次随机抽 20)
 const FINAL_Q = [
   {q:'哪个是声母?',opts:['b','a','zhi'],ans:0},
   {q:'哪个是韵母?',opts:['m','ang','shi'],ans:1},
@@ -435,7 +539,13 @@ const FINAL_Q = [
   {q:'哪个是声母?',opts:['en','q','ye'],ans:1},
   {q:'哪个是韵母?',opts:['s','ing','chi'],ans:1},
   {q:'"en" 是哪种韵母?',opts:['单韵母','前鼻韵母','后鼻韵母'],ans:1},
-  {q:'x + īng 拼在一起,读作?',opts:['xīng','xāng','xī'],ans:0}
+  {q:'x + īng 拼在一起,读作?',opts:['xīng','xāng','xī'],ans:0},
+  {q:'「shou」的声调标在哪个字母上?',opts:['o','u','sh'],ans:0},
+  {q:'「niu」的声调标在哪个字母上?',opts:['i','u','n'],ans:1},
+  {q:'j 和 ü 拼在一起,写成?',opts:['ju','jü','jǖ'],ans:0},
+  {q:'「鱼」的拼音是?',opts:['yú','yǘ','wú'],ans:0},
+  {q:'「绿」的拼音是?',opts:['lǜ','lu','lù'],ans:0},
+  {q:'「女」的拼音是?',opts:['nǚ','nu','nù'],ans:0}
 ];
 
 /* ---------- 工具 ---------- */
@@ -476,7 +586,7 @@ function celebrate(){
 }
 
 /* ---------- 全局状态 ---------- */
-const state = {name:'小朋友', stars:0, done:{yun:false,sheng:false,zhengt:false,tone:false,final:false}};
+const state = {name:'小朋友', stars:0, done:{yun:false,sheng:false,zhengt:false,tone1:false,tone2:false,special:false,final:false}};
 function addStar(key){
   if(state.done[key]) return;
   state.done[key]=true; state.stars++;
@@ -489,19 +599,22 @@ function renderStars(){ $('star-count').textContent = state.stars; }
 /* ---------- 地图 ---------- */
 function renderMap(){
   const houses = [
-    {key:'yun',id:'screen-yun',ico:'🏠',nm:'韵母屋',desc:'24个韵母 · 分类',color:'#ec4899'},
-    {key:'sheng',id:'screen-sheng',ico:'🏠',nm:'声母屋',desc:'23个声母 · 拼一拼',color:'#3b82f6'},
-    {key:'zhengt',id:'screen-zhengt',ico:'🏠',nm:'整体认读音节屋',desc:'16个 · 连连看',color:'#22c55e'},
-    {key:'tone',id:'screen-tone',ico:'🎵',nm:'声调擂台',desc:'四个声调',color:'#f97316'},
-    {key:'final',id:'screen-final',ico:'🏆',nm:'大闯关',desc:'拿奖状!',color:'#8b5cf6'}
+    {id:'screen-yun',ico:'🏠',nm:'韵母屋',desc:'24个韵母 · 分类',color:'#ec4899',keys:['yun']},
+    {id:'screen-sheng',ico:'🏠',nm:'声母屋',desc:'23个声母 · 拼一拼',color:'#3b82f6',keys:['sheng']},
+    {id:'screen-zhengt',ico:'🏠',nm:'整体认读音节屋',desc:'16个 · 连连看',color:'#22c55e',keys:['zhengt']},
+    {id:'screen-tone',ico:'🎵',nm:'声调擂台',desc:'声调 + 标调规则',color:'#f97316',keys:['tone1','tone2']},
+    {id:'screen-special',ico:'✨',nm:'魔法拼写屋',desc:'j q x y 的魔法',color:'#8b5cf6',keys:['special']},
+    {id:'screen-final',ico:'🏆',nm:'大闯关',desc:'拿奖状!',color:'#d97706',keys:['final']}
   ];
-  $('map-cards').innerHTML = houses.map(h=>`
-    <div class="house" data-go="${h.id}" style="border-color:${h.color};">
+  $('map-cards').innerHTML = houses.map(h=>{
+    const done = h.keys.filter(k=>state.done[k]).length;
+    return `<div class="house" data-go="${h.id}" style="border-color:${h.color};">
       <div class="ico">${h.ico}</div>
       <div class="nm" style="color:${h.color};">${h.nm}</div>
       <div class="desc">${h.desc}</div>
-      <div class="done">${state.done[h.key]?'⭐':''}</div>
-    </div>`).join('');
+      <div class="done">${done>0 ? '⭐'.repeat(done) : ''}</div>
+    </div>`;
+  }).join('');
 }
 
 /* ---------- 卡片墙 ---------- */
@@ -667,7 +780,7 @@ function renderLines(){
   });
 }
 
-/* ---------- 游戏4:声调(20题,随机) ---------- */
+/* ---------- 游戏4:第几声(20题,随机) ---------- */
 let g4={q:[],idx:0,correct:0};
 function startGame4(){
   g4.q=pick(G4_BANK,20); g4.idx=0; g4.correct=0;
@@ -691,13 +804,82 @@ function onG4Tone(btn){
     $('g4-feedback').textContent=`✅ 对啦!${q.w} 读 ${q.py}`; $('g4-feedback').className='feedback good';
     g4.idx++;
     if(g4.idx>=20){
-      setTimeout(()=>{ $('g4-feedback').textContent='🎉 20题声调全对!帽子戴得真准!'; addStar('tone'); },600);
+      setTimeout(()=>{ $('g4-feedback').textContent='🎉 20题声调全对!帽子戴得真准!'; addStar('tone1'); },600);
     }else{
       setTimeout(showG4Question,800);
     }
   }else{
     btn.classList.add('wiggle'); setTimeout(()=>btn.classList.remove('wiggle'),450);
     $('g4-feedback').textContent='再想想,是第几声呢?'; $('g4-feedback').className='feedback bad';
+  }
+}
+
+/* ---------- 游戏5:给谁戴帽子(标调) ---------- */
+let g5={q:[],idx:0,correct:0};
+function startGame5(){
+  g5.q=pick(BIAODIAO_BANK,12); g5.idx=0; g5.correct=0;
+  $('g5-stage').style.display='block';
+  $('g5-feedback').textContent=''; $('g5-feedback').className='feedback';
+  showG5Question();
+}
+function showG5Question(){
+  const q=g5.q[g5.idx];
+  $('g5-img').textContent=q.e;
+  $('g5-word').textContent=q.w;
+  $('g5-progress').textContent=`第 ${g5.idx+1} / ${g5.q.length} 题`;
+  $('g5-tiles').innerHTML = q.tiles.map((t,i)=>`<button class="g5-tile" data-v="${t}">${t}</button>`).join('');
+  $('g5-answer').textContent='';
+  $('g5-feedback').textContent=''; $('g5-feedback').className='feedback';
+}
+function onG5Tile(btn){
+  const q=g5.q[g5.idx];
+  if(btn.dataset.v===q.ans){
+    g5.correct++;
+    $('g5-answer').textContent=`${q.w} 读作 ${q.full}`;
+    $('g5-feedback').textContent='✅ 对啦!帽子戴对了!'; $('g5-feedback').className='feedback good';
+    g5.idx++;
+    if(g5.idx>=g5.q.length){
+      setTimeout(()=>{ $('g5-feedback').textContent='🎉 标调规则全掌握啦!'; addStar('tone2'); },600);
+    }else{
+      setTimeout(showG5Question,900);
+    }
+  }else{
+    btn.classList.add('wiggle'); setTimeout(()=>btn.classList.remove('wiggle'),450);
+    $('g5-feedback').textContent='再想想,帽子该戴在哪个字母上?'; $('g5-feedback').className='feedback bad';
+  }
+}
+
+/* ---------- 游戏6:ü 摘不摘帽子 ---------- */
+let g6={q:[],idx:0,correct:0};
+function startGame6(){
+  g6.q=shuffle(SPECIAL_BANK); g6.idx=0; g6.correct=0;
+  $('g6-stage').style.display='block';
+  $('g6-feedback').textContent=''; $('g6-feedback').className='feedback';
+  showG6Question();
+}
+function showG6Question(){
+  const q=g6.q[g6.idx];
+  $('g6-img').textContent=q.e;
+  $('g6-word').textContent=q.w;
+  $('g6-word').onclick=()=>speak(q.w);
+  $('g6-progress').textContent=`第 ${g6.idx+1} / ${g6.q.length} 题`;
+  $('g6-opts').innerHTML = q.opts.map((o,i)=>`<button class="opt-btn" data-i="${i}">${o}</button>`).join('');
+  $('g6-feedback').textContent=''; $('g6-feedback').className='feedback';
+}
+function onG6Opt(btn){
+  const q=g6.q[g6.idx];
+  if(Number(btn.dataset.i)===q.ans){
+    g6.correct++;
+    $('g6-feedback').textContent='✅ 对啦!'; $('g6-feedback').className='feedback good';
+    g6.idx++;
+    if(g6.idx>=g6.q.length){
+      setTimeout(()=>{ $('g6-feedback').textContent='🎉 拼写魔法全掌握啦!'; addStar('special'); },600);
+    }else{
+      setTimeout(showG6Question,900);
+    }
+  }else{
+    btn.classList.add('wiggle'); setTimeout(()=>btn.classList.remove('wiggle'),450);
+    $('g6-feedback').textContent='再想想,ü 的帽子摘了还是没摘?'; $('g6-feedback').className='feedback bad';
   }
 }
 
@@ -762,31 +944,36 @@ function init(){
     if(house){ show(house.dataset.go); return; }
   });
 
-  // 游戏1 韵母分类
   $('btn-start-g1').addEventListener('click',startGame1);
   document.querySelector('#g1-stage .opts').addEventListener('click',e=>{
     const b=e.target.closest('.quiz-opt'); if(b) onG1Cat(b);
   });
 
-  // 游戏2 拼一拼
   $('btn-start-g2').addEventListener('click',startGame2);
   $('g2-opts').addEventListener('click',e=>{
     const b=e.target.closest('.opt-btn'); if(b) onG2Opt(b);
   });
 
-  // 游戏3 连连看
   $('btn-start-g3').addEventListener('click',startGame3);
   $('g3-left').addEventListener('click',e=>{ const it=e.target.closest('.g3-item'); if(it) onG3Left(it); });
   $('g3-right').addEventListener('click',e=>{ const it=e.target.closest('.g3-item'); if(it) onG3Right(it); });
   window.addEventListener('resize',renderLines);
 
-  // 游戏4 声调
   $('btn-start-g4').addEventListener('click',startGame4);
   $('g4-tones').addEventListener('click',e=>{
     const b=e.target.closest('.tone-btn'); if(b) onG4Tone(b);
   });
 
-  // 大闯关
+  $('btn-start-g5').addEventListener('click',startGame5);
+  $('g5-tiles').addEventListener('click',e=>{
+    const b=e.target.closest('.g5-tile'); if(b) onG5Tile(b);
+  });
+
+  $('btn-start-g6').addEventListener('click',startGame6);
+  $('g6-opts').addEventListener('click',e=>{
+    const b=e.target.closest('.opt-btn'); if(b) onG6Opt(b);
+  });
+
   $('btn-start-final').addEventListener('click',startFinal);
   $('final-opts').addEventListener('click',e=>{
     const b=e.target.closest('.quiz-opt'); if(b) onFinalOpt(b);
