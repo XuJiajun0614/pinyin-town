@@ -552,13 +552,37 @@ const FINAL_Q = [
 const $ = id => document.getElementById(id);
 function shuffle(a){const arr=[...a];for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
 function pick(arr,n){return shuffle(arr).slice(0,n);}
+let _voices = [];
+function loadVoices(){
+  try{ if('speechSynthesis' in window){ _voices = speechSynthesis.getVoices(); } }catch(e){}
+}
+function pickVoice(){
+  if(!_voices.length) loadVoices();
+  const zh = _voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('zh'));
+  if(!zh.length) return null;
+  // 优先选听起来更像真人(自然/童声/清晰)的中文语音
+  const prefs = ['Xiaoxiao','Xiaoyi','Yunjian','Yunxi','Natural','Yaoyao','Huihui','Kangkang','普通话'];
+  for(const p of prefs){
+    const f = zh.find(v => v.name.indexOf(p) >= 0);
+    if(f) return f;
+  }
+  return zh[0];
+}
 function speak(text){
   try{
     if(!('speechSynthesis' in window)) return;
     const u = new SpeechSynthesisUtterance(text);
-    u.lang='zh-CN'; u.rate=0.8;
+    u.lang='zh-CN';
+    u.rate=0.6;      // 放慢,像老师一个字一个字清楚地读
+    u.pitch=1.05;    // 音调稍微提高,更亲切
+    const v = pickVoice();
+    if(v) u.voice = v;
     speechSynthesis.cancel(); speechSynthesis.speak(u);
   }catch(e){}
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = loadVoices;
+  loadVoices();
 }
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
